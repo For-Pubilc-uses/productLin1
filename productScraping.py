@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import openai 
-openai.api_key = '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'
+import dotenv
+
+api_config = dotenv.dotenv_values('.env')
+openai.api_key = api_config['open_api_key']
+
 app = FastAPI()
 
 function_description = [
