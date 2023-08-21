@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import openai 
 import dotenv
 
+
 api_config = dotenv.dotenv_values('.env')
 openai.api_key = api_config['open_api_key']
 
@@ -27,25 +28,23 @@ function_description = [
                             "type": "string",
                             "description": "the URL for the product, e.g. http://zylker.com/store/Cliq-wireless-headphones/34452//know-more",
                         },
+                        "description": {
+                            "type": "string",
+                            "description": "the description for the product, e.g. High Peformance Wheat Germ Extract that has been contained an abundance of the translation factors that are required for protein synthesis.",
+                        },
                     },
-                    "required": ["company"],
+                    "required": ["text","image","url","description"],
                 },
             }
         ]
 
 query = """
-{
-  "type": "links",
-  "text": "$Allevi 3 Bioprinter",
-  "image": "https://www.amerigoscientific.org/wp-content/themes/amerigo-scientific/img/Allevi-3-Bioprinter-1.png",
-  "links": [
-    {
-      "url": "https://www.amerigoscientific.org/allevi-3-bioprinter-item-55496.html",
-      "text": "Click here to buy",
-      //"icon": "http://zylker.com/help/home.png"
-    }
-  ]
-}
+type: "links",
+text: "$Wheat Germ Extract WEPRO7240",
+image: "https://resource.amerigoscientific.com/p-img/WEPRO7240.png",
+description:"High Peformance Wheat Germ Extract that has been contained an abundance of the translation factors that are required for protein synthesis."
+url: "https://www.amerigoscientific.org/wheat-germ-extract-wepro7240-item-237474.html",
+text: "Click here to buy"
 """
 prompt = f'please extract the information for given context {query}'
 
@@ -56,7 +55,7 @@ response = openai.ChatCompletion.create(
         function_call="auto"
     )
 # ['message']['function_call']['arguments']
-#print(response['choices'][0]['message']['function_call']['arguments'])
+print(response['choices'][0]['message']['function_call']['arguments'])
 
 @app.get('/')
 def index():
@@ -83,9 +82,11 @@ def analyze_email(email:Email):
     textContent = eval(val).get('text')
     imageContent = eval(val).get('image')
     urlContent = eval(val).get('url')
+    desContent = eval(val).get('description')
 
     return {
         "text":textContent,
         "image":imageContent,
         "url":urlContent,
+         "description":desContent
     }
